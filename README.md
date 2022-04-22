@@ -1,6 +1,6 @@
-# Smart Bera (interface-cerveja)
+# Smart Beer (smart-beer)
 
-Interface de controle do sistema de automação da produção da cerveja
+Aplicativo de controle de uma panela automatizada
 
 ## Install the dependencies
 ```bash

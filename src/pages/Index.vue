@@ -1,49 +1,20 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+  <q-page class="flex justify-center">
+    <div class="text-primary text-center text-bold text-h3 full-width" style="padding-top: 60px">
+      Smart Beer
+    </div>
+    <div class="column items-center" style="width: 75%">
+      <q-btn class="full-width" color="primary" label="Conectar Dispositivo"/>
+      <q-btn class="full-width q-my-sm" outline color="primary" label="Sobre o Projeto" @click="$router.push('/projeto')"/>
+      <q-btn class="full-width" outline color="primary" label="Sobre a Disciplina" @click="$router.push('/disciplina')"/>
+    </div>
   </q-page>
 </template>
 
-<script lang="ts">
-import { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/CompositionComponent.vue';
-import { defineComponent, ref } from 'vue';
+<script>
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'PageIndex',
-  components: { ExampleComponent },
-  setup() {
-    const todos = ref<Todo[]>([
-      {
-        id: 1,
-        content: 'ct1'
-      },
-      {
-        id: 2,
-        content: 'ct2'
-      },
-      {
-        id: 3,
-        content: 'ct3'
-      },
-      {
-        id: 4,
-        content: 'ct4'
-      },
-      {
-        id: 5,
-        content: 'ct5'
-      }
-    ]);
-    const meta = ref<Meta>({
-      totalCount: 1200
-    });
-    return { todos, meta };
-  }
-});
+  name: 'PageIndex'
+})
 </script>
