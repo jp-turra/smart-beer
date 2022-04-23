@@ -5,15 +5,29 @@ const routes = [
     children: [{ path: "", component: () => import("pages/Index.vue") }],
   },
   {
-    path: "/",
+    path: "/projeto",
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {
-        path: "projeto",
+        path: "",
         component: () => import("src/pages/Sobre/Projeto.vue"),
       },
       {
-        path: "disciplina",
+        path: "setup",
+        component: () => import("src/pages/Projeto/Setup.vue"),
+      },
+      {
+        path: "principal",
+        component: () => import("src/pages/Projeto/Principal.vue"),
+      },
+    ],
+  },
+  {
+    path: "/disciplina",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
         component: () => import("src/pages/Sobre/Disciplina.vue"),
       },
     ],
