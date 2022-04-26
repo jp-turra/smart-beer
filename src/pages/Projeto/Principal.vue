@@ -16,8 +16,21 @@
       class="q-my-lg full-width shadow-4 column q-py-sm"
       style="border-radius: 20px"
     >
-      <div class="q-mb-md text-bold">Temperatura</div>
+      <div class="q-mb-md text-bold">
+        <span>Temperatura</span>
+        <span style="font-size: 0.8rem">{{ data }}</span>
+      </div>
       <span>{{ temperatura }}ºC</span>
+      <div class="full-width text-center q-mt-sm">
+        <q-btn
+          flat
+          dense
+          class="full-width"
+          color="primary"
+          icon="refresh"
+          @click="btService.sendData(this.device, 'get|')"
+        />
+      </div>
     </div>
     <div class="q-my-lg">
       <q-input
@@ -25,15 +38,11 @@
         type="number"
         label="Definir limite de temperatura:"
       />
-      <q-input
+      <!-- <q-input
         v-model="dado.tempo"
         type="number"
         label="Definir tempo de atuação:"
-      />
-    </div>
-    <div class="q-my-lg column">
-      Última mensagem:
-      {{ lastMessage }}
+      /> -->
     </div>
     <div>
       <q-btn
@@ -52,6 +61,17 @@
         color="primary"
         label="Pré Definição"
         @click="openDialog"
+      />
+    </div>
+    <div>
+      <q-btn
+        rounded
+        dense
+        outline
+        class="full-width q-mt-md"
+        color="primary"
+        label="Histórico"
+        @click="openDialogHistorico"
       />
     </div>
     <q-dialog v-model="modal" persistent full-width>
@@ -110,31 +130,55 @@
 import { Loading } from "quasar";
 import BluetoothService from "src/services/bluetooth";
 import { defineComponent } from "vue";
+import moment from "moment";
 export default defineComponent({
   name: "Disciplina",
   data() {
     return {
       btService: new BluetoothService(this.$store),
       dado: {
-        temperatura: 0,
+        temperatura: 21,
         tempo: 0,
       },
       modal: false,
       temperatura: 0,
+      interval: undefined,
+      openDialogHistorico: false,
+      data: "",
     };
   },
   created() {
+    if (this.interval) clearInterval(this.interval);
     if (!this.device) {
       this.$router.push("/");
       return;
     }
     this.setupListener();
+    this.interval = setInterval(() => {
+      this.btService.sendData(this.device, "get|");
+    }, 10000);
+  },
+  beforeUnmount() {
+    if (this.interval) clearInterval(this.interval);
   },
   computed: {
     device() {
       return this.$store.getters.getDevice;
     },
+    historico() {
+      return this.$store.getters.getHistorico;
+    },
     lastMessage() {
+      if (
+        this.$store.getters.getLastMessage &&
+        this.$store.getters.getLastMessage[0] == "T"
+      ) {
+        this.temperatura = parseInt(
+          this.$store.getters.getLastMessage.substring(1)
+        );
+        this.data = moment().format("DD/MM - HH:MM");
+      }
+
       return this.$store.getters.getLastMessage;
     },
   },
@@ -143,12 +187,11 @@ export default defineComponent({
       Loading.show({
         message: "Enviando comando...",
       });
-      let cmd = `P${this.dado.temperatura}-${this.dado.tempo}`;
+      let cmd = `set&P${this.dado.temperatura}-${this.dado.tempo}`;
       if (cmd.indexOf("|") == -1 || cmd.indexOf("|") != cmd.length - 1)
         cmd += "|";
-      const res = await this.btService.sendData(this.device, cmd);
+      await this.btService.sendData(this.device, cmd);
       Loading.hide();
-      console.log("response ", res);
     },
     setupListener() {
       this.btService.subscribe();

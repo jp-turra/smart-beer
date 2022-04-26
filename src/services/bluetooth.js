@@ -147,6 +147,7 @@ export default class BluetoothService {
     bluetoothSerial.subscribe(
       "\n",
       (data) => {
+        console.log("Data Recived ", data);
         this.store.commit("setLastMessage", data);
       },
       () => {
