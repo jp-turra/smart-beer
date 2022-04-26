@@ -17,10 +17,10 @@
       style="border-radius: 20px"
     >
       <div class="q-mb-md text-bold">
-        <span>Temperatura</span>
+        <span>Temperatura</span> <br />
         <span style="font-size: 0.8rem">{{ data }}</span>
       </div>
-      <span>{{ temperatura }}ºC</span>
+      <span>{{ temperatura ? temperatura : 21 }}ºC</span>
       <div class="full-width text-center q-mt-sm">
         <q-btn
           flat
@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import { Loading } from "quasar";
+import { Loading, Notify } from "quasar";
 import BluetoothService from "src/services/bluetooth";
 import { defineComponent } from "vue";
 import moment from "moment";
@@ -141,7 +141,6 @@ export default defineComponent({
         tempo: 0,
       },
       modal: false,
-      temperatura: 0,
       interval: undefined,
       openDialogHistorico: false,
       data: "",
@@ -168,18 +167,14 @@ export default defineComponent({
     historico() {
       return this.$store.getters.getHistorico;
     },
-    lastMessage() {
+    temperatura() {
       if (
         this.$store.getters.getLastMessage &&
         this.$store.getters.getLastMessage[0] == "T"
       ) {
-        this.temperatura = parseInt(
-          this.$store.getters.getLastMessage.substring(1)
-        );
         this.data = moment().format("DD/MM - HH:MM");
+        return parseInt(this.$store.getters.getLastMessage.substring(1));
       }
-
-      return this.$store.getters.getLastMessage;
     },
   },
   methods: {
@@ -190,7 +185,14 @@ export default defineComponent({
       let cmd = `set&P${this.dado.temperatura}-${this.dado.tempo}`;
       if (cmd.indexOf("|") == -1 || cmd.indexOf("|") != cmd.length - 1)
         cmd += "|";
-      await this.btService.sendData(this.device, cmd);
+      const res = await this.btService.sendData(this.device, cmd);
+      Notify.create({
+        message:
+          res == "OK"
+            ? "Comando enviado com sucesso"
+            : "Falha ao enviar o comando",
+        type: res == "OK" ? "positive" : "warning",
+      });
       Loading.hide();
     },
     setupListener() {
