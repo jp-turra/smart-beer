@@ -72,7 +72,7 @@
         class="full-width q-mt-md"
         color="primary"
         label="Histórico"
-        @click="openDialogHistorico"
+        @click="openDialogHistorico = true"
       />
     </div>
     <q-dialog v-model="modal" persistent full-width>
@@ -124,6 +124,22 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="openDialogHistorico" persistent full-width>
+      <q-card style="max-height: 80%">
+        <q-card-section
+          class="row items-center"
+          @click="utilizarReceita(40, 40)"
+        >
+          <ul>
+            <li v-for="(hist, index) in historico" :key="index">{{ hist }}</li>
+          </ul>
+        </q-card-section>
+        <q-separator color="primary" />
+        <q-card-actions align="center">
+          <q-btn flat label="Voltar" color="primary" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -166,7 +182,9 @@ export default defineComponent({
       return this.$store.getters.getDevice;
     },
     historico() {
-      return this.$store.getters.getHistorico;
+      return this.$store.getters.getHistory
+        ? this.$store.getters.getHistory
+        : [];
     },
     temperatura() {
       if (

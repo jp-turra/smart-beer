@@ -124,7 +124,8 @@ export default class BluetoothService {
         });
         reject(false);
       } else {
-        console.log("enviando ", data);
+        console.log("enviando ", "send - " + JSON.stringify(data));
+        this.store.commit("pushHistory", data);
         bluetoothSerial.write(data, resolve, reject);
       }
     });
