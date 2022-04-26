@@ -25,6 +25,7 @@
         <q-btn
           flat
           dense
+          size="14px"
           class="full-width"
           color="primary"
           icon="refresh"
