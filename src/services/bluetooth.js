@@ -2,7 +2,7 @@ import bluetoothSerial from "../../src-cordova/plugins/cordova-plugin-bluetooth-
 import { Loading, Notify, Platform } from "quasar";
 
 export default class BluetoothService {
-  constructor(store) {
+  constructor(store, router) {
     this.store = store;
   }
 
@@ -97,6 +97,8 @@ export default class BluetoothService {
         },
         () => {
           this.unsubscribe();
+          if (this.store) this.store.commit("setDevice", {});
+          if (this.router) this.router.push("/setup");
           bluetoothSerial.clearDeviceDiscoveredListener();
           reject();
         }
@@ -110,14 +112,20 @@ export default class BluetoothService {
           message: "Nenhum dispositivo conectado",
           color: "warning",
         });
+        if (this.store) this.store.commit("setDevice", {});
+        if (this.router) this.router.push("/setup");
         reject(false);
       } else if (!(await this.isEneabled())) {
+        if (this.store) this.store.commit("setDevice", {});
+        if (this.router) this.router.push("/setup");
         Notify.create({
           message: "Bluetooth não habilitado.",
           color: "warning",
         });
         reject(false);
       } else if (!(await this.isConnected())) {
+        if (this.store) this.store.commit("setDevice", {});
+        if (this.router) this.router.push("/setup");
         Notify.create({
           message: "Nenhum dispositivo conectado",
           color: "warning",

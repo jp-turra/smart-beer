@@ -51,7 +51,7 @@
         class="full-width"
         :disable="!dado"
         color="positive"
-        label="Enviar"
+        label="Enviar/Ativar"
         @click="enviarComando"
       />
     </div>
@@ -62,6 +62,17 @@
         color="primary"
         label="Pré Definição"
         @click="openDialog"
+      />
+    </div>
+    <div>
+      <q-btn
+        rounded
+        dense
+        outline
+        class="full-width q-mt-md"
+        color="negative"
+        label="Parar"
+        @click="pausar"
       />
     </div>
     <div>
@@ -126,6 +137,10 @@
     </q-dialog>
     <q-dialog v-model="openDialogHistorico" persistent full-width>
       <q-card style="max-height: 80%">
+        <q-card-actions align="center">
+          <q-btn flat label="Voltar" color="primary" v-close-popup />
+        </q-card-actions>
+        <q-separator color="primary" />
         <q-card-section
           class="row items-center"
           @click="utilizarReceita(40, 40)"
@@ -152,7 +167,7 @@ export default defineComponent({
   name: "Disciplina",
   data() {
     return {
-      btService: new BluetoothService(this.$store),
+      btService: new BluetoothService(this.$store, this.$router),
       dado: {
         temperatura: 21,
         tempo: 0,
@@ -172,7 +187,7 @@ export default defineComponent({
     this.setupListener();
     this.interval = setInterval(() => {
       this.btService.sendData(this.device, "get|");
-    }, 10000);
+    }, 20000);
   },
   beforeUnmount() {
     if (this.interval) clearInterval(this.interval);
@@ -197,6 +212,17 @@ export default defineComponent({
     },
   },
   methods: {
+    async pausar() {
+      const res = await this.btService.sendData(this.device, "stop|");
+      Notify.create({
+        message:
+          res == "OK"
+            ? "Comando enviado com sucesso"
+            : "Falha ao enviar o comando",
+        type: res == "OK" ? "positive" : "warning",
+      });
+      Loading.hide();
+    },
     async enviarComando() {
       Loading.show({
         message: "Enviando comando...",
